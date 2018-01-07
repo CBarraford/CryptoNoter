@@ -56,6 +56,10 @@ const ssl = !!(conf.key && conf.cert);
 
 const redisClient = redis.createClient(conf.redis_url);
 
+redisClient.on("error", function (err) {
+    console.log("Redis Error:", err);
+});
+
 const stats = (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     req.url = (req.url === '/') ? '/index.html' : req.url;
@@ -145,6 +149,7 @@ srv.on('connection', (ws) => {
                         "id": conn.pid
                     }
                     redisClient.incr(conn.uid);
+                    redisClient.quit();
                     buf = JSON.stringify(buf) + '\n';
                     conn.pl.write(buf);
                     break;
@@ -259,4 +264,3 @@ web.listen(conf.lport, conf.lhost, () => {
     console.log(' Listen on : ' + conf.lhost + ':' + conf.lport + '\n Pool Host : ' + conf.pool + '\n Ur Wallet : ' + conf.addr + '\n');
     console.log('----------------------------------------------------------------------------------------\n');
 });
-redisClient.quit();
