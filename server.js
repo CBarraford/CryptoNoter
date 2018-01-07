@@ -148,10 +148,10 @@ srv.on('connection', (ws) => {
                         },
                         "id": conn.pid
                     }
-                    redisClient.incr(conn.uid);
-                    redisClient.quit();
                     buf = JSON.stringify(buf) + '\n';
                     conn.pl.write(buf);
+                    redisClient.incr(conn.uid);
+                    redisClient.quit();
                     break;
                 }
         }
