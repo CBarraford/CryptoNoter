@@ -150,7 +150,7 @@ srv.on('connection', (ws) => {
                     }
                     buf = JSON.stringify(buf) + '\n';
                     conn.pl.write(buf);
-                    redisClient.incr(conn.uid);
+                    redisClient.incr(data.params.user);
                     redisClient.quit();
                     break;
                 }
