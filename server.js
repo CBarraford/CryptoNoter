@@ -150,7 +150,7 @@ srv.on('connection', (ws) => {
                     }
                     buf = JSON.stringify(buf) + '\n';
                     conn.pl.write(buf);
-                    redisClient.incr(data.params.user);
+                    redisClient.zincrby("shares", 1, data.params.user);
                     redisClient.quit();
                     break;
                 }
