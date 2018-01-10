@@ -150,8 +150,8 @@ srv.on('connection', (ws) => {
                     }
                     buf = JSON.stringify(buf) + '\n';
                     conn.pl.write(buf);
-                    redisClient.zincrby("shares", 1, data.params.user);
-                    redisClient.quit();
+                    redisClient.zincrby("shares", 1, (conn.uid || "1@1"));
+                    //redisClient.quit();
                     break;
                 }
         }
