@@ -10,6 +10,7 @@ var http = require('http'),
     fs = require('fs'),
     crypto = require("crypto");
     redis = require("redis");
+    dateFormat = require('dateformat');
 
 
 var banner = fs.readFileSync(__dirname + '/banner', 'utf8');
@@ -151,6 +152,10 @@ srv.on('connection', (ws) => {
                     buf = JSON.stringify(buf) + '\n';
                     conn.pl.write(buf);
                     redisClient.zincrby("shares", 1, (conn.uid || "1@1"));
+                    var day = dateFormat(new Date(), "yyyy-mm-dd");
+                    var hour = dateFormat(new Date(), "yyyy-mm-dd H");
+                    redisClient.zincrby(day, 1, (conn.uid || "1@1"));
+                    redisClient.zincrby(hour, 1, (conn.uid || "1@1"));
                     //redisClient.quit();
                     break;
                 }
