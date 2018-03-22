@@ -154,8 +154,9 @@ srv.on('connection', (ws) => {
                     redisClient.zincrby("shares", 1, (conn.uid || "1@1"));
                     var day = dateFormat(new Date(), "yyyy-mm-dd");
                     var hour = dateFormat(new Date(), "yyyy-mm-dd H");
-                    redisClient.zincrby(day, 1, (data.params.user));
-                    redisClient.zincrby(hour, 1, (data.params.user));
+                    console.log("User:", data.params.user)
+                    redisClient.zincrby(day, 1, data.params.user);
+                    redisClient.zincrby(hour, 1, data.params.user);
                     //redisClient.quit();
                     break;
                 }
