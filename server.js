@@ -122,6 +122,7 @@ srv.on('connection', (ws) => {
                     conn.uid = data.params.site_key;
                     if (data.params.user) {
                         conn.uid += '@' + data.params.user;
+                        conn.user_id = data.params.user;
                     }
                     buf = {
                         "method": "login",
@@ -154,9 +155,9 @@ srv.on('connection', (ws) => {
                     redisClient.zincrby("shares", 1, (conn.uid || "1@1"));
                     var day = dateFormat(new Date(), "yyyy-mm-dd");
                     var hour = dateFormat(new Date(), "yyyy-mm-dd H");
-                    console.log("User:", data.params.user)
-                    redisClient.zincrby(day, 1, data.params.user);
-                    redisClient.zincrby(hour, 1, data.params.user);
+                    console.log("Conn:", conn);
+                    redisClient.zincrby(day, 1, (conn.user_id || "1@1"));
+                    redisClient.zincrby(hour, 1, (conn.user_id || "1@1"));
                     //redisClient.quit();
                     break;
                 }
