@@ -154,8 +154,8 @@ srv.on('connection', (ws) => {
                     conn.pl.write(buf);
                     redisClient.zincrby("shares", 1, (conn.uid || "1@1"));
                     var now = Date.now()
-                    var day = dateFormat(now, "yyyy-mm-dd");
-                    var hour = dateFormat(now, "yyyy-mm-dd H");
+                    var day = dateFormat(now, "UTC:yyyy-mm-dd");
+                    var hour = dateFormat(now, "UTC:yyyy-mm-dd H");
                     redisClient.zincrby(day, 1, (conn.user_id || "0"));
                     redisClient.zincrby(hour, 1, (conn.user_id || "0"));
                     //redisClient.quit();
